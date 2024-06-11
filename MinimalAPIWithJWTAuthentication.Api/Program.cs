@@ -1,10 +1,10 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using MinimalAPIWithJWTAuthentication.API.Repositories;
 using MinimalAPIWithJWTAuthentication.Api.Abstracts;
 using MinimalAPIWithJWTAuthentication.Api.Configurations;
 using MinimalAPIWithJWTAuthentication.Api.Services;
+using MinimalAPIWithJWTAuthentication.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -4,7 +4,8 @@ using MinimalAPIWithJWTAuthentication.Api.Models;
 
 namespace MinimalAPIWithJWTAuthentication.Api.Controllers;
 
-public class AuthenticationController
+
+public class AuthenticationController : ControllerBase
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
 

@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using MinimalAPIWithJWTAuthentication.Api.Abstracts;
+using MinimalAPIWithJWTAuthentication.Api.Configurations;
 using MinimalAPIWithJWTAuthentication.Api.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
@@ -20,7 +23,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
         var claims = new List<Claim>
     {
-      new("sub", user.Id.ToString()),
+      new("sub", user.UserID.ToString()),
       new("first_name", user.FirstName),
       new("last_name", user.LastName)
     };
@@ -69,3 +72,4 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             return false;
         }
     }
+}
