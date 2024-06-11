@@ -8,46 +8,52 @@ using System.Security.Claims;
 using System.Text;
 
 namespace MinimalAPIWithJWTAuthentication.Api.Services;
-public class JwtTokenGenerator : IJwtTokenGenerator
+public class JwtTokenGenerator : ITokenService
 {
-    private readonly JwtAuthenticationConfig _jwtAuthenticationConfig;
+    private readonly JwtTokenConfig _jwtTokenOptions;
+    private readonly UserService _userService;
 
-    public JwtTokenGenerator(IOptions<JwtAuthenticationConfig> jwtAuthenticationConfig)
+    public JwtTokenGenerator(IOptions<JwtTokenConfig> jwtTokenOptions, UserService userService)
     {
-        _jwtAuthenticationConfig = jwtAuthenticationConfig.Value;
+        _jwtTokenOptions = jwtTokenOptions.Value ?? throw new ArgumentNullException(nameof(jwtTokenOptions));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
     }
 
-    public string GenerateToken(User user)
+    public async Task<string> GenerateTokenAsync(UserAuth userAuth)
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtAuthenticationConfig.Key));
+        var isValidUser = await _userService.ValidateUserCredentialsAsync(userAuth.UserName, userAuth.Password);
 
-        var claims = new List<Claim>
-    {
-      new("sub", user.UserID.ToString()),
-      new("first_name", user.FirstName),
-      new("last_name", user.LastName)
-    };
+        if (!isValidUser)
+        {
+            return null;
+        }
 
-        var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        var user = await _userService.GetByUserNameAsync(userAuth.UserName);
 
-        var jwtSecurityToken = new JwtSecurityToken(
-          issuer: _jwtAuthenticationConfig.Issuer,
-          audience: _jwtAuthenticationConfig.Audience,
-          claims: claims,
-          notBefore: DateTime.UtcNow,
-          expires: DateTime.UtcNow.AddMinutes(_jwtAuthenticationConfig.LifetimeMinutes),
-          signingCredentials: signingCredentials
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        };
+
+        var key = new SymmetricSecurityKey(Convert.FromBase64String(_jwtTokenOptions.SecretKey));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            _jwtTokenOptions.Issuer,
+            _jwtTokenOptions.Audience,
+            claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: credentials
         );
 
-        var token = new JwtSecurityTokenHandler()
-          .WriteToken(jwtSecurityToken);
-
-        return token;
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public bool ValidateToken(string token)
+    public async Task<TokenValidationResult> ValidateTokenAsync(string token)
     {
-        var key = Encoding.UTF8.GetBytes(_jwtAuthenticationConfig.Key);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = new SymmetricSecurityKey(Convert.FromBase64String(_jwtTokenOptions.SecretKey));
 
         var validationParameters = new TokenValidationParameters
         {
@@ -55,21 +61,10 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = _jwtAuthenticationConfig.Issuer,
-            ValidAudience = _jwtAuthenticationConfig.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(key)
+            ValidIssuer = _jwtTokenOptions.Issuer,
+            ValidAudience = _jwtTokenOptions.Audience,
+            IssuerSigningKey = key
         };
 
-        try
-        {
-            new JwtSecurityTokenHandler()
-              .ValidateToken(token, validationParameters, out _);
-
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        return await tokenHandler.ValidateTokenAsync(token, validationParameters);
     }
-}
