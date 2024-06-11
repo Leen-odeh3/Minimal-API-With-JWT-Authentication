@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MinimalAPIWithJWTAuthentication.Api.Abstracts;
+using MinimalAPIWithJWTAuthentication.Api.Models;
 
 namespace MinimalAPIWithJWTAuthentication.Api.Controllers;
 
