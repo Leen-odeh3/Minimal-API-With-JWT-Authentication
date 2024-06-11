@@ -15,7 +15,7 @@ public class UserService
 
     public async Task AddUserAsync(User user)
     {
-        if (user == null)
+        if (user is null)
         {
             throw new ArgumentNullException(nameof(user));
         }
@@ -25,7 +25,7 @@ public class UserService
 
     public async Task DeleteUserAsync(User user)
     {
-        if (user == null)
+        if (user is null)
         {
             throw new ArgumentNullException(nameof(user));
         }
@@ -45,7 +45,7 @@ public class UserService
 
     public async Task UpdateUserAsync(User user)
     {
-        if (user == null)
+        if (user is null)
         {
             throw new ArgumentNullException(nameof(user));
         }
