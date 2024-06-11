@@ -5,10 +5,10 @@ using MinimalAPIWithJWTAuthentication.Api.Configurations;
 using MinimalAPIWithJWTAuthentication.Api.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+
 
 namespace MinimalAPIWithJWTAuthentication.Api.Services;
-public class JwtTokenGenerator : ITokenService
+public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly JwtAuthenticationConfig _jwtTokenOptions;
     private readonly UserService _userService;
@@ -18,8 +18,7 @@ public class JwtTokenGenerator : ITokenService
         _jwtTokenOptions = jwtTokenOptions.Value ?? throw new ArgumentNullException(nameof(jwtTokenOptions));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
     }
-
-    public async Task<string> GenerateTokenAsync(User userAuth)
+    public async Task<string> GenerateTokenAsync(AuthRequestBody userAuth)
     {
         var isValidUser = await _userService.ValidateUserCredentialsAsync(userAuth.Username, userAuth.Password);
 
@@ -32,8 +31,8 @@ public class JwtTokenGenerator : ITokenService
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
         };
 
         var key = new SymmetricSecurityKey(Convert.FromBase64String(_jwtTokenOptions.SecretKey));
@@ -68,3 +67,4 @@ public class JwtTokenGenerator : ITokenService
 
         return await tokenHandler.ValidateTokenAsync(token, validationParameters);
     }
+}
