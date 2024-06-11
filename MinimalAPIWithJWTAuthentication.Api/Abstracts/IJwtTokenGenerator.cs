@@ -4,6 +4,6 @@ using MinimalAPIWithJWTAuthentication.Api.Models;
 namespace MinimalAPIWithJWTAuthentication.Api.Abstracts;
 public interface IJwtTokenGenerator
 {
-    Task<string> GenerateTokenAsync(User user);
+    Task<string> GenerateTokenAsync(AuthRequestBody user);
     Task<TokenValidationResult> ValidateTokenAsync(string token);
 }

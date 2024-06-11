@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MinimalAPIWithJWTAuthentication.Api.Abstracts;
+using MinimalAPIWithJWTAuthentication.Api.Services;
 using System.Security.Claims;
 
 namespace MinimalAPIWithJWTAuthentication.Api.Controllers;
@@ -10,9 +11,9 @@ namespace MinimalAPIWithJWTAuthentication.Api.Controllers;
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
-    private readonly ITokenService _tokenService;
+    private readonly IJwtTokenGenerator _tokenService;
 
-    public UserController(UserService userService, ITokenService tokenService)
+    public UserController(UserService userService, IJwtTokenGenerator tokenService)
     {
         _userService = userService;
         _tokenService = tokenService;
@@ -26,7 +27,7 @@ public class UserController : ControllerBase
 
         var principal = await _tokenService.ValidateTokenAsync(token);
 
-        if (principal == null)
+        if (principal is null)
         {
             return Unauthorized();
         }

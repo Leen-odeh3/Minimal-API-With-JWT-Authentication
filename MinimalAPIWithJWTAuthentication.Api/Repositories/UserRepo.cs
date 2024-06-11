@@ -1,8 +1,10 @@
-﻿using MinimalAPIWithJWTAuthentication.Api.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using MinimalAPIWithJWTAuthentication.Api.Abstracts;
+using MinimalAPIWithJWTAuthentication.Api.DBContext;
+using MinimalAPIWithJWTAuthentication.Api.Models;
 
 namespace MinimalAPIWithJWTAuthentication.Api.Repositories;
-
-public class UserRepository : IUserRepository
+public class UserRepository : IUserRepo
 {
     private readonly UsersDbContext _dbContext;
 
@@ -13,7 +15,7 @@ public class UserRepository : IUserRepository
 
     public async Task AddAsync(User user)
     {
-        if (user == null)
+        if (user is null)
         {
             throw new ArgumentNullException(nameof(user));
         }
@@ -24,7 +26,7 @@ public class UserRepository : IUserRepository
 
     public async Task DeleteAsync(User user)
     {
-        if (user == null)
+        if (user is null)
         {
             throw new ArgumentNullException(nameof(user));
         }
@@ -45,12 +47,12 @@ public class UserRepository : IUserRepository
 
     public async Task<User> GetUserByUsernameAsync(string username)
     {
-        return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username) ?? throw new ArgumentNullException("User");
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == username) ?? throw new ArgumentNullException("User");
     }
 
     public async Task UpdateAsync(User user)
     {
-        if (user == null)
+        if (user is null)
         {
             throw new ArgumentNullException(nameof(user));
         }
@@ -62,5 +64,6 @@ public class UserRepository : IUserRepository
     public async Task<bool> ValidateUserCredentialsAsync(string username, string password)
     {
         return await _dbContext.Users
-            .FirstOrDefaultAsync(u => u.UserName == username && u.Password == password) != null;
+            .FirstOrDefaultAsync(u => u.Username == username && u.Password == password) is not null;
     }
+}
