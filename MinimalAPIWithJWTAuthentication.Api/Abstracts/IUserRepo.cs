@@ -2,8 +2,8 @@
 
 namespace MinimalAPIWithJWTAuthentication.Api.Abstracts;
 
-public interface IUserRepo
+public interface IUserRepo : IRepo<User>
 {
-    Task<User?> Get(string userName, string password);
-
+    Task<bool> ValidateUserCredentialsAsync(string username, string password);
+    Task<User> GetUserByUsernameAsync(string username);
 }
