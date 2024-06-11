@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MinimalAPIWithJWTAuthentication.Api.Controllers;
 
@@ -7,6 +8,7 @@ namespace MinimalAPIWithJWTAuthentication.Api.Controllers;
 public class TestController : ControllerBase
 {
     [HttpGet]
+    [Authorize]
     public ActionResult<string> GetMessage()
     {
         return Ok("Welcome to our API! Thank you for visiting.");
