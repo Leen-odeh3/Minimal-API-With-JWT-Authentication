@@ -1,11 +1,12 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPIWithJWTAuthentication.Api.Abstracts;
 using MinimalAPIWithJWTAuthentication.Api.Configurations;
 using MinimalAPIWithJWTAuthentication.Api.Services;
-using MinimalAPIWithJWTAuthentication.Api.Repositories;
 using MinimalAPIWithJWTAuthentication.Api.DBContext;
+using MinimalAPIWithJWTAuthentication.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +18,12 @@ builder.Services.AddDbContext<UsersDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
 
-builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IUserRepo, UserRepository>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<ITokenService, JwtTokenGenerator>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.Configure<JwtAuthenticationConfig>(builder.Configuration.GetSection("JWTToken"));
 
-var jwtConfig = builder.Configuration.GetSection("JWTToken").Get<JwtAuthenticationConfig>() ?? throw new ArgumentNullException("JWTToken:Wrong Configuration");
+var jwtConfig = builder.Configuration.GetSection("JwtAuthenticationConfig").Get<JwtAuthenticationConfig>() ?? throw new ArgumentNullException("JWTToken:Wrong Configuration");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

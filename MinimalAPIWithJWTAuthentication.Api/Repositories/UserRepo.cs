@@ -60,10 +60,10 @@ public class UserRepository : IUserRepo
         _dbContext.Set<User>().Update(user);
         await _dbContext.SaveChangesAsync();
     }
-
     public async Task<bool> ValidateUserCredentialsAsync(string username, string password)
     {
         return await _dbContext.Users
             .FirstOrDefaultAsync(u => u.Username == username && u.Password == password) is not null;
     }
+
 }
