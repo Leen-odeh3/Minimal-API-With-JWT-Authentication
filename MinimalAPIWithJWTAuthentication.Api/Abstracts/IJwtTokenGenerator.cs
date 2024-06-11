@@ -1,9 +1,9 @@
-﻿using MinimalAPIWithJWTAuthentication.Api.Models;
+﻿using Microsoft.IdentityModel.Tokens;
+using MinimalAPIWithJWTAuthentication.Api.Models;
 
 namespace MinimalAPIWithJWTAuthentication.Api.Abstracts;
 public interface IJwtTokenGenerator
 {
-    string GenerateToken(User user);
-
-    bool ValidateToken(string token);
+    Task<string> GenerateTokenAsync(User user);
+    Task<TokenValidationResult> ValidateTokenAsync(string token);
 }

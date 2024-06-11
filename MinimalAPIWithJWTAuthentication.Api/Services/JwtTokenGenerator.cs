@@ -10,25 +10,25 @@ using System.Text;
 namespace MinimalAPIWithJWTAuthentication.Api.Services;
 public class JwtTokenGenerator : ITokenService
 {
-    private readonly JwtTokenConfig _jwtTokenOptions;
+    private readonly JwtAuthenticationConfig _jwtTokenOptions;
     private readonly UserService _userService;
 
-    public JwtTokenGenerator(IOptions<JwtTokenConfig> jwtTokenOptions, UserService userService)
+    public JwtTokenGenerator(IOptions<JwtAuthenticationConfig> jwtTokenOptions, UserService userService)
     {
         _jwtTokenOptions = jwtTokenOptions.Value ?? throw new ArgumentNullException(nameof(jwtTokenOptions));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
     }
 
-    public async Task<string> GenerateTokenAsync(UserAuth userAuth)
+    public async Task<string> GenerateTokenAsync(User userAuth)
     {
-        var isValidUser = await _userService.ValidateUserCredentialsAsync(userAuth.UserName, userAuth.Password);
+        var isValidUser = await _userService.ValidateUserCredentialsAsync(userAuth.Username, userAuth.Password);
 
         if (!isValidUser)
         {
             return null;
         }
 
-        var user = await _userService.GetByUserNameAsync(userAuth.UserName);
+        var user = await _userService.GetByUserNameAsync(userAuth.Username);
 
         var claims = new[]
         {

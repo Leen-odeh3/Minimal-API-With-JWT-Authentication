@@ -6,24 +6,23 @@ namespace MinimalAPIWithJWTAuthentication.Api.Controllers;
 
 public class AuthenticationController : ControllerBase
 {
-    private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly ITokenService _tokenGenerator;
 
-    private readonly IUserRepo _userRepository;
-
-    public AuthenticationController(IUserRepo userRepository, IJwtTokenGenerator jwtTokenGenerator)
+    public AuthController(ITokenService tokenGenerator)
     {
-        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-
-        _jwtTokenGenerator = jwtTokenGenerator ?? throw new ArgumentNullException(nameof(jwtTokenGenerator));
+        _tokenGenerator = tokenGenerator;
     }
 
-    [HttpPost("Login")]
-    public async Task<ActionResult<string>> Authenticate(AuthRequestBody authenticationRequestBody)
+    [HttpPost("token")]
+    public async Task<IActionResult> GenerateToken([FromBody] User input)
     {
-        var user = await _userRepository.Get(authenticationRequestBody.Username, authenticationRequestBody.Password);
+        var token = await _tokenGenerator.GenerateTokenAsync(input);
 
-        if (user is null) return Unauthorized();
+        if (token == null)
+        {
+            return Unauthorized();
+        }
 
-        return Ok(_jwtTokenGenerator.GenerateToken(user));
+        return Ok(new { Token = token });
     }
 }
