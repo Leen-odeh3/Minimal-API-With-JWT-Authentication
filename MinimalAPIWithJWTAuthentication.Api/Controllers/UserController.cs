@@ -42,7 +42,7 @@ public class UserController : ControllerBase
     {
         var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
-        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int authenticatedUserId))
+        if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out int authenticatedUserId))
         {
             return Unauthorized();
         }
