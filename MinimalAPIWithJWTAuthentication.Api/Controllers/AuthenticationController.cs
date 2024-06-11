@@ -4,7 +4,6 @@ using MinimalAPIWithJWTAuthentication.Api.Models;
 
 namespace MinimalAPIWithJWTAuthentication.Api.Controllers;
 
-
 public class AuthenticationController : ControllerBase
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
@@ -18,7 +17,7 @@ public class AuthenticationController : ControllerBase
         _jwtTokenGenerator = jwtTokenGenerator ?? throw new ArgumentNullException(nameof(jwtTokenGenerator));
     }
 
-    [HttpPost("authenticate")]
+    [HttpPost("Login")]
     public async Task<ActionResult<string>> Authenticate(AuthRequestBody authenticationRequestBody)
     {
         var user = await _userRepository.Get(authenticationRequestBody.Username, authenticationRequestBody.Password);
